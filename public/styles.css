@@ -1,0 +1,189 @@
+/* =============================
+   Estilos básicos y generales
+============================= */
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #fafafa;
+    color: #333;
+}
+
+.container {
+    max-width: 900px;
+    margin: auto;
+    padding: 20px;
+}
+
+/* =============================
+   Encabezado
+============================= */
+.header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 2em;
+    color: #222;
+}
+
+.header p {
+    margin: 5px 0;
+    color: #555;
+}
+
+/* =============================
+   Sección de carga de archivos
+============================= */
+.upload-section {
+    background: #fff;
+    padding: 15px 20px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    margin-bottom: 20px;
+}
+
+.upload-area {
+    border: 1px dashed #aaa;
+    border-radius: 6px;
+    text-align: center;
+    padding: 20px;
+    cursor: pointer;
+    transition: background 0.2s;
+    margin-bottom: 10px;
+}
+
+.upload-area:hover {
+    background: #f4f4f4;
+}
+
+.file-input {
+    display: none;
+}
+
+.upload-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+#fileInfo {
+    margin-top: 8px;
+    font-size: 0.9em;
+    color: #555;
+}
+
+/* =============================
+   Botones
+============================= */
+.btn {
+    background: #2d89ef;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+}
+
+.btn:hover {
+    background: #1b5dab;
+}
+
+.btn:disabled {
+    background: #bbb;
+    cursor: not-allowed;
+}
+
+/* =============================
+   Mensajes
+============================= */
+#messagesSection {
+    margin-top: 10px;
+}
+
+.success-message {
+    padding: 8px;
+    border-radius: 4px;
+    background: #d4edda;
+    color: #155724;
+    margin-bottom: 10px;
+    font-size: 0.9em;
+}
+
+.error-message {
+    padding: 8px;
+    border-radius: 4px;
+    background: #f8d7da;
+    color: #721c24;
+    margin-bottom: 10px;
+    font-size: 0.9em;
+}
+
+/* =============================
+   Tabs y contenido
+============================= */
+.results-section {
+    background: #fff;
+    padding: 15px 20px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+}
+
+.tabs-nav {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 8px;
+    background: #eee;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 0.9em;
+}
+
+.tab-btn.active {
+    background: #2d89ef;
+    color: white;
+    border-color: #1b5dab;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* =============================
+   Tablas
+============================= */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 8px;
+    font-size: 0.9em;
+}
+
+table th, table td {
+    border: 1px solid #ccc;
+    padding: 6px;
+    text-align: center;
+}
+
+table th {
+    background: #2d89ef;
+    color: white;
+}
+
+table tr:nth-child(even) {
+    background: #f9f9f9;
+}

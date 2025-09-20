@@ -1,138 +1,66 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>TourneyJS - Analizador de Torneos</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚽</text></svg>">
+    <link rel="stylesheet" href="./styles.css" />
 </head>
+
 <body>
     <div class="container">
-        <!-- Header -->
         <header class="header">
-            <div class="header-content">
-                <h1 class="main-title">⚽ TourneyJS</h1>
-                <p class="subtitle">Analizador Léxico para Gestión de Torneos Deportivos</p>
-                <div class="header-info">
-                    <span class="info-item">📚 Lenguajes Formales y de Programación</span>
-                    <span class="info-item">🏛️ Universidad San Carlos de Guatemala</span>
-                </div>
-            </div>
-            <div class="header-decoration"></div>
+            <h1>⚽ TourneyJS</h1>
+            <p>Analizador Léxico para Gestión de Torneos Deportivos</p>
         </header>
 
-        <!-- Main Content -->
-        <main class="main-content">
-            <!-- File Upload Section -->
-            <section class="upload-section">
-                <div class="upload-container">
-                    <div class="upload-header">
-                        <h2>📁 Cargar Archivo de Torneo</h2>
-                        <p>Selecciona un archivo de texto con la definición del torneo en formato TourneyJS</p>
-                    </div>
-                    
-                    <div class="upload-area" id="uploadArea">
-                        <div class="upload-icon">📂</div>
-                        <p>Arrastra tu archivo aquí o haz clic para seleccionar</p>
-                        <input type="file" id="fileInput" accept=".txt" class="file-input">
-                        <div class="file-info" id="fileInfo"></div>
-                    </div>
-                    
-                    <div class="upload-actions">
-                        <button class="btn btn-primary" id="analyzeBtn" disabled>
-                            🔍 Analizar Archivo
-                        </button>
-                        <button class="btn btn-secondary" id="sampleBtn">
-                            📝 Cargar Ejemplo
-                        </button>
-                        <button class="btn btn-outline" id="clearBtn">
-                            🗑️ Limpiar
-                        </button>
+        <section class="upload-section">
+            <h2>📁 Cargar Archivo de Torneo</h2>
+
+            <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+                <div>📂</div>
+                <p>Haz clic para seleccionar un archivo .txt</p>
+                <input type="file" id="fileInput" accept=".txt" class="file-input" />
+            </div>
+
+            <div class="upload-actions">
+                <button class="btn" id="analyzeBtn" disabled>🔍 Analizar Archivo</button>
+                <button class="btn" id="sampleBtn">📄 Cargar Ejemplo</button>
+                <button class="btn" id="clearBtn">🗑️ Limpiar</button>
+            </div>
+
+            <div id="fileInfo"></div>
+        </section>
+
+        <section id="messagesSection"></section>
+
+        <section class="results-section">
+            <nav class="tabs-nav">
+                <button class="tab-btn active" data-tab="tokens">🏷️ Tokens (<span id="tokensCount">0</span>)</button>
+                <button class="tab-btn" data-tab="errors">❌ Errores (<span id="errorsCount">0</span>)</button>
+            </nav>
+
+            <div class="tabs-content">
+                <div class="tab-content active" id="tokensTab">
+                    <h3>🏷️ Tokens Reconocidos</h3>
+                    <div id="tokensContent">
+                        <p>Carga un archivo para ver los tokens reconocidos</p>
                     </div>
                 </div>
-            </section>
 
-            <!-- Messages Section -->
-            <section class="messages-section" id="messagesSection"></section>
-
-            <!-- Results Section -->
-            <section class="results-section" id="resultsSection">
-                <!-- Navigation Tabs -->
-                <nav class="tabs-nav">
-                    <button class="tab-btn active" data-tab="tokens">
-                        🏷️ Tokens
-                        <span class="tab-count" id="tokensCount">0</span>
-                    </button>
-                    <button class="tab-btn" data-tab="errors">
-                        ❌ Errores
-                        <span class="tab-count" id="errorsCount">0</span>
-                    </button>
-                    <button class="tab-btn" data-tab="bracket">
-                        🏆 Bracket
-                    </button>
-                    <button class="tab-btn" data-tab="stats">
-                        📊 Estadísticas
-                    </button>
-                    <button class="tab-btn" data-tab="graphviz">
-                        📈 Graphviz
-                    </button>
-                </nav>
-
-                <!-- Tab Contents -->
-                <div class="tabs-content">
-                    <!-- Tokens Tab -->
-                    <div class="tab-content active" id="tokensTab">
-                        <div class="tab-header">
-                            <h3>🏷️ Tokens Reconocidos</h3>
-                            <div class="tab-actions">
-                                <button class="btn btn-small btn-outline" id="exportTokensBtn">
-                                    💾 Exportar CSV
-                                </button>
-                            </div>
-                        </div>
-                        <div class="tab-body">
-                            <div id="tokensContent">
-                                <div class="empty-state">
-                                    <div class="empty-icon">🏷️</div>
-                                    <p>No hay tokens para mostrar</p>
-                                    <small>Carga un archivo para ver los tokens reconocidos</small>
-                                </div>
-                            </div>
-                        </div>
+                <div class="tab-content" id="errorsTab">
+                    <h3>❌ Errores Léxicos</h3>
+                    <div id="errorsContent">
+                        <p>Los errores léxicos aparecerán aquí si se encuentran</p>
                     </div>
+                </div>
+            </div>
+        </section>
+    </div>
 
-                    <!-- Errors Tab -->
-                    <div class="tab-content" id="errorsTab">
-                        <div class="tab-header">
-                            <h3>❌ Errores Léxicos</h3>
-                            <div class="tab-actions">
-                                <button class="btn btn-small btn-outline" id="exportErrorsBtn">
-                                    💾 Exportar CSV
-                                </button>
-                            </div>
-                        </div>
-                        <div class="tab-body">
-                            <div id="errorsContent">
-                                <div class="empty-state">
-                                    <div class="empty-icon">✅</div>
-                                    <p>No hay errores para mostrar</p>
-                                    <small>Los errores léxicos aparecerán aquí si se encuentran</small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+    <!-- IMPORTANT: asumimos que los módulos están en public/src/ -->
+    <script type="module" src="./src/ui.js"></script>
+</body>
 
-                    <!-- Bracket Tab -->
-                    <div class="tab-content" id="bracketTab">
-                        <div class="tab-header">
-                            <h3>🏆 Bracket del Torneo</h3>
-                            <div class="tab-actions">
-                                <button class="btn btn-small btn-outline" id="exportBracketBtn">
-                                    📄 Exportar PDF
-                                </button>
-                            </div>
-                        </div>
-                        <div class="tab-body">
-                            <div id="bracketContent">
-                                <div class="empty-state">
+</html>
