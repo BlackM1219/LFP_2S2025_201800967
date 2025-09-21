@@ -2,64 +2,46 @@
 <html lang="es">
 
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta charset="UTF-8">
     <title>TourneyJS - Analizador de Torneos</title>
-    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="styles.css">
+    <!-- Viz.js para render Graphviz en el navegador -->
+    <script src="https://unpkg.com/viz.js@2.1.2/viz.js"></script>
+    <script src="https://unpkg.com/viz.js@2.1.2/full.render.js"></script>
 </head>
 
 <body>
     <div class="container">
-        <header class="header">
-            <h1>⚽ TourneyJS</h1>
-            <p>Analizador Léxico para Gestión de Torneos Deportivos</p>
-        </header>
+        <div class="header">
+            <h1>TourneyJS</h1>
+            <p>Analizador y reportes de torneos deportivos</p>
+        </div>
 
-        <section class="upload-section">
-            <h2>📁 Cargar Archivo de Torneo</h2>
+        <div class="upload-section">
+            <p>Selecciona un archivo de torneo (.txt):</p>
+            <input type="file" id="fileInput" accept=".txt">
+            <button id="analyzeBtn" class="btn" disabled>Analizar</button>
+        </div>
 
-            <div class="upload-area" onclick="document.getElementById('fileInput').click()">
-                <div>📂</div>
-                <p>Haz clic para seleccionar un archivo .txt</p>
-                <input type="file" id="fileInput" accept=".txt" class="file-input" />
+        <div class="results-section">
+            <div class="tabs-nav">
+                <button class="tab-btn active" data-tab="tokensTab">Tokens</button>
+                <button class="tab-btn" data-tab="errorsTab">Errores</button>
+                <button class="tab-btn" data-tab="bracketTab">Bracket</button>
+                <button class="tab-btn" data-tab="teamStatsTab">Estadísticas Equipos</button>
+                <button class="tab-btn" data-tab="scorersTab">Goleadores</button>
+                <button class="tab-btn" data-tab="generalInfoTab">Info General</button>
             </div>
 
-            <div class="upload-actions">
-                <button class="btn" id="analyzeBtn" disabled>🔍 Analizar Archivo</button>
-                <button class="btn" id="sampleBtn">📄 Cargar Ejemplo</button>
-                <button class="btn" id="clearBtn">🗑️ Limpiar</button>
-            </div>
-
-            <div id="fileInfo"></div>
-        </section>
-
-        <section id="messagesSection"></section>
-
-        <section class="results-section">
-            <nav class="tabs-nav">
-                <button class="tab-btn active" data-tab="tokens">🏷️ Tokens (<span id="tokensCount">0</span>)</button>
-                <button class="tab-btn" data-tab="errors">❌ Errores (<span id="errorsCount">0</span>)</button>
-            </nav>
-
-            <div class="tabs-content">
-                <div class="tab-content active" id="tokensTab">
-                    <h3>🏷️ Tokens Reconocidos</h3>
-                    <div id="tokensContent">
-                        <p>Carga un archivo para ver los tokens reconocidos</p>
-                    </div>
-                </div>
-
-                <div class="tab-content" id="errorsTab">
-                    <h3>❌ Errores Léxicos</h3>
-                    <div id="errorsContent">
-                        <p>Los errores léxicos aparecerán aquí si se encuentran</p>
-                    </div>
-                </div>
-            </div>
-        </section>
+            <div id="tokensTab" class="tab-content active"></div>
+            <div id="errorsTab" class="tab-content"></div>
+            <div id="bracketTab" class="tab-content"></div>
+            <div id="teamStatsTab" class="tab-content"></div>
+            <div id="scorersTab" class="tab-content"></div>
+            <div id="generalInfoTab" class="tab-content"></div>
+        </div>
     </div>
 
-    <!-- IMPORTANT: asumimos que los módulos están en public/src/ -->
     <script type="module" src="./src/ui.js"></script>
 </body>
 
