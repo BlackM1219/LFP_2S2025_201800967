@@ -3,46 +3,39 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TourneyJS - Analizador de Torneos</title>
-    <link rel="stylesheet" href="styles.css">
-    <!-- Viz.js para render Graphviz en el navegador -->
-    <script src="https://unpkg.com/viz.js@2.1.2/viz.js"></script>
-    <script src="https://unpkg.com/viz.js@2.1.2/full.render.js"></script>
+    <link rel="stylesheet" href="styles.css?v=1.0.4">
 </head>
 
 <body>
     <div class="container">
-        <div class="header">
+        <header class="header">
             <h1>TourneyJS</h1>
             <p>Analizador y reportes de torneos deportivos</p>
-        </div>
+        </header>
 
-        <div class="upload-section">
-            <p>Selecciona un archivo de torneo (.txt):</p>
-            <input type="file" id="fileInput" accept=".txt">
+        <section class="upload-section">
+            <label for="fileInput">Selecciona el archivo de torneo (.txt):</label>
+            <input type="file" id="fileInput" accept=".txt" title="Selecciona un archivo de torneo en formato .txt">
             <button id="analyzeBtn" class="btn" disabled>Analizar</button>
-        </div>
+            <button id="generateReportBtn" class="btn" disabled>Generar Reporte</button>
+        </section>
 
-        <div class="results-section">
-            <div class="tabs-nav">
+        <section class="results-section">
+            <nav class="tabs-nav">
                 <button class="tab-btn active" data-tab="tokensTab">Tokens</button>
                 <button class="tab-btn" data-tab="errorsTab">Errores</button>
-                <button class="tab-btn" data-tab="bracketTab">Bracket</button>
-                <button class="tab-btn" data-tab="teamStatsTab">Estadísticas Equipos</button>
-                <button class="tab-btn" data-tab="scorersTab">Goleadores</button>
-                <button class="tab-btn" data-tab="generalInfoTab">Info General</button>
-            </div>
+            </nav>
 
             <div id="tokensTab" class="tab-content active"></div>
             <div id="errorsTab" class="tab-content"></div>
-            <div id="bracketTab" class="tab-content"></div>
-            <div id="teamStatsTab" class="tab-content"></div>
-            <div id="scorersTab" class="tab-content"></div>
-            <div id="generalInfoTab" class="tab-content"></div>
-        </div>
+        </section>
     </div>
 
-    <script type="module" src="./src/ui.js"></script>
+    <script type="module" src="./src/ui.js?v=1.0.4"></script>
 </body>
 
 </html>
