@@ -1,13 +1,13 @@
 import Lexer from './lexer.js';
-import Parser from './parser.js';
-import Tournament from './tournament.js';
 import {
     renderTokensTable,
     generateErrorTable,
     generateStandingsTable,
     generateTeamStatsTable,
-    generateIndividualStatsTable
+    generateIndividualStatsTable,
+    generateGeneralInfoTable
 } from './reports.js';
+import { analyzeFromTokens } from './analizer.js';
 
 const fileInput = document.getElementById('fileInput');
 const analyzeBtn = document.getElementById('analyzeBtn');
@@ -17,7 +17,7 @@ const tabContents = document.querySelectorAll('.tab-content');
 
 let fileText = '';
 
-// 1) Navegación de pestañas
+// 1) Pestañas
 tabButtons.forEach(btn => {
     btn.addEventListener('click', () => {
         tabButtons.forEach(b => b.classList.remove('active'));
@@ -27,7 +27,7 @@ tabButtons.forEach(btn => {
     });
 });
 
-// 2) Lectura de archivo
+// 2) Leer archivo
 fileInput.addEventListener('change', async e => {
     const f = e.target.files[0];
     if (f) {
@@ -42,59 +42,101 @@ fileInput.addEventListener('change', async e => {
 
 // 3) Análisis léxico
 analyzeBtn.addEventListener('click', () => {
-    const { tokens, errors } = new Lexer(fileText).tokenize();
+    const { tokens = [], errors = [] } = new Lexer(fileText).tokenize();
 
     document.getElementById('tokensTab').innerHTML =
         renderTokensTable(tokens);
 
-    document.getElementById('errorsTab').innerHTML =
-        generateErrorTable(errors);
+    let errHtml = generateErrorTable(errors);
+    if (errors.length) {
+        errHtml += `<p style="color:#a00; margin-top:8px;">
+      Se encontraron ${errors.length} errores léxicos.
+    </p>`;
+    }
+    document.getElementById('errorsTab').innerHTML = errHtml;
 
-    // habilita Generar Reporte solo si no hay errores
-    generateReportBtn.disabled = errors.length !== 0;
+    generateReportBtn.disabled = false;
 });
 
-// 4) Generar y abrir reporte (solo tablas)
-generateReportBtn.addEventListener('click', () => {
-    // reconstruye el modelo de torneo
-    const lexResult = new Lexer(fileText).tokenize();
-    const ast = new Parser(lexResult.tokens).parse();
-    const tournament = new Tournament(ast);
-    tournament.computeStats();
+// 4) Generar reporte
+generateReportBtn.addEventListener('click', async() => {
+    const reportWin = window.open('', '_blank');
 
-    // construye el HTML del reporte
-    const html = `<!DOCTYPE html>
+    try {
+        const { tokens = [] } = new Lexer(fileText).tokenize();
+        const {
+            tournament: t,
+            standings,
+            scorers,
+            bracketDOT,
+            totalMatches,
+            totalGoals
+        } = await analyzeFromTokens(tokens, { allowParseErrors: true });
+
+        if (Array.isArray(standings)) {
+            t.teams = standings.map(s => ({
+                name: s.name,
+                stats: s.stats,
+                phaseReached: s.phaseReached
+            }));
+        }
+
+        const html = `<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <title>Reporte de Torneo</title>
-  <link rel="stylesheet" href="styles.css?v=1.0.4">
+  <link rel="stylesheet" href="styles.css?v=1.0.6">
+  <style>
+    body { font-family:sans-serif; margin:1rem; }
+    h1,h2 { margin-bottom:.5rem; }
+    section { margin-top:1.5rem; }
+    table { width:100%; border-collapse:collapse; margin-top:.5rem; }
+    th,td { border:1px solid #ccc; padding:.25rem .5rem; text-align:left; }
+    pre { background:#f5f5f5; padding:.5rem; overflow:auto; }
+  </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Reporte de Torneo: ${tournament.name || ''}</h1>
+  <h1>Reporte de Torneo: ${t.name}</h1>
 
-    <section>
-      <h2>Tabla de Posiciones Finales</h2>
-      ${generateStandingsTable(tournament)}
-    </section>
+  <section>
+    <h2>Información General</h2>
+    ${generateGeneralInfoTable(t)}
+    <p>Total partidos: ${totalMatches} — Total goles: ${totalGoals}</p>
+  </section>
 
-    <section>
-      <h2>Estadísticas por Equipo</h2>
-      ${generateTeamStatsTable(tournament)}
-    </section>
+  <section>
+    <h2>Tabla de Posiciones Finales</h2>
+    ${generateStandingsTable(t)}
+  </section>
 
-    <section>
-      <h2>Estadísticas Individuales (Goleadores)</h2>
-      ${generateIndividualStatsTable(tournament)}
-    </section>
-  </div>
+  <section>
+    <h2>Estadísticas por Equipo</h2>
+    ${generateTeamStatsTable(t)}
+  </section>
+
+  <section>
+    <h2>Ranking de Goleadores</h2>
+    ${generateIndividualStatsTable(t)}
+  </section>
+
+  <section>
+    <h2>Bracket (formato DOT)</h2>
+    <pre>${(bracketDOT||'').replace(/</g,'&lt;')}</pre>
+  </section>
 </body>
 </html>`;
 
-    // abre en nueva pestaña
-    const blob = new Blob([html], { type: 'text/html' });
-    const url = URL.createObjectURL(blob);
-    window.open(url, '_blank');
+        reportWin.document.open();
+        reportWin.document.write(html);
+        reportWin.document.close();
+
+    } catch (err) {
+        console.error('Error generando reporte:', err);
+        reportWin.document.body.innerHTML = `
+      <p style="color:red;">
+        No se pudo generar el reporte:<br>${err.message}
+      </p>`;
+    }
 });

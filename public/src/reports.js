@@ -1,22 +1,50 @@
-// 1) Render de tabla de tokens
+// 1) Información General
+export function generateGeneralInfoTable(tournament) {
+    const totalMatches = tournament.matches.length;
+    const totalGoals = tournament.matches.reduce((sum, m) => {
+        if (!m.score) return sum;
+        const [hg, ag] = m.score.split("-").map(Number);
+        return sum + (hg || 0) + (ag || 0);
+    }, 0);
+    const avgGoals = totalMatches > 0 ?
+        (totalGoals / totalMatches).toFixed(2) :
+        "0";
+
+    const rows = [
+        `<tr><th>Nombre del Torneo</th><td>${tournament.name}</td></tr>`,
+        tournament.sede ?
+        `<tr><th>Sede</th><td>${tournament.sede}</td></tr>` :
+        "",
+        `<tr><th>Equipos Participantes</th><td>${tournament.teams.length}</td></tr>`,
+        `<tr><th>Total de Partidos</th><td>${totalMatches}</td></tr>`,
+        `<tr><th>Total de Goles</th><td>${totalGoals}</td></tr>`,
+        `<tr><th>Promedio Goles/Partido</th><td>${avgGoals}</td></tr>`
+    ].join("");
+
+    return `<table>${rows}</table>`;
+}
+
+// 2) Tabla de Tokens
 export function renderTokensTable(tokens) {
-    if (!Array.isArray(tokens) || tokens.length === 0) {
+    if (!tokens.length) {
         return '<p>⚠️ No se encontraron tokens</p>';
     }
     const rows = tokens.map((t, i) => `
     <tr>
       <td>${i + 1}</td>
-      <td>${t.lexema   || ''}</td>
-      <td>${t.tipo     || ''}</td>
-      <td>${t.linea    || ''}</td>
-      <td>${t.columna  || ''}</td>
+      <td>${t.lexema}</td>
+      <td>${t.tipo}</td>
+      <td>${t.linea}</td>
+      <td>${t.columna}</td>
     </tr>
-  `).join('');
+  `).join("");
+
     return `
     <table>
       <thead>
         <tr>
-          <th>#</th><th>Lexema</th><th>Tipo</th><th>Línea</th><th>Columna</th>
+          <th>#</th><th>Lexema</th><th>Tipo</th>
+          <th>Línea</th><th>Columna</th>
         </tr>
       </thead>
       <tbody>${rows}</tbody>
@@ -24,21 +52,22 @@ export function renderTokensTable(tokens) {
   `;
 }
 
-// 2) Render de tabla de errores léxicos
+// 3) Tabla de Errores
 export function generateErrorTable(errors) {
-    if (!Array.isArray(errors) || errors.length === 0) {
+    if (!errors.length) {
         return '<p>✅ No se encontraron errores léxicos</p>';
     }
     const rows = errors.map((e, i) => `
     <tr>
       <td>${i + 1}</td>
-      <td>${e.lexema   || ''}</td>
-      <td>${e.tipo     || ''}</td>
-      <td>${e.desc     || ''}</td>
-      <td>${e.linea    || ''}</td>
-      <td>${e.columna  || ''}</td>
+      <td>${e.lexema}</td>
+      <td>${e.tipo}</td>
+      <td>${e.desc}</td>
+      <td>${e.linea}</td>
+      <td>${e.columna}</td>
     </tr>
-  `).join('');
+  `).join("");
+
     return `
     <table>
       <thead>
@@ -52,47 +81,44 @@ export function generateErrorTable(errors) {
   `;
 }
 
-// 3) Tabla de posiciones finales
+// 4) Tabla de Posiciones Finales
 export function generateStandingsTable(tournament) {
-    const teams = Array.isArray(tournament.teams) ? tournament.teams.slice() : [];
-    if (teams.length === 0) {
+    const teams = [...tournament.teams].sort((a, b) => {
+        if (b.stats.points !== a.stats.points) {
+            return b.stats.points - a.stats.points;
+        }
+        const gdA = a.stats.goalsFor - a.stats.goalsAgainst;
+        const gdB = b.stats.goalsFor - b.stats.goalsAgainst;
+        return gdB - gdA;
+    });
+
+    if (!teams.length) {
         return '<p>⚠️ No hay equipos registrados</p>';
     }
 
-    teams.sort((a, b) => {
-        const pa = (a.stats && a.stats.points) || 0;
-        const pb = (b.stats && b.stats.points) || 0;
-        if (pb !== pa) return pb - pa;
-        const gda = ((a.stats.goalsFor) || 0) - ((a.stats.goalsAgainst) || 0);
-        const gdb = ((b.stats.goalsFor) || 0) - ((b.stats.goalsAgainst) || 0);
-        return gdb - gda;
-    });
-
-    const rows = teams.map((team, i) => {
-        const s = team.stats || {};
-        const gd = (s.goalsFor || 0) - (s.goalsAgainst || 0);
-        return `
-      <tr>
-        <td>${i + 1}</td>
-        <td>${team.name || ''}</td>
-        <td>${s.played        || 0}</td>
-        <td>${s.won           || 0}</td>
-        <td>${s.draw          || 0}</td>
-        <td>${s.lost          || 0}</td>
-        <td>${s.goalsFor      || 0}</td>
-        <td>${s.goalsAgainst  || 0}</td>
-        <td>${gd}</td>
-        <td>${s.points        || 0}</td>
-      </tr>
-    `;
-    }).join('');
+    const rows = teams.map((t, i) => `
+    <tr>
+      <td>${i + 1}</td>
+      <td>${t.name}</td>
+      <td>${t.stats.played}</td>
+      <td>${t.stats.won}</td>
+      <td>${t.stats.draw}</td>
+      <td>${t.stats.lost}</td>
+      <td>${t.stats.goalsFor}</td>
+      <td>${t.stats.goalsAgainst}</td>
+      <td>${t.stats.goalsFor - t.stats.goalsAgainst}</td>
+      <td>${t.stats.points}</td>
+      <td>${t.phaseReached}</td>
+    </tr>
+  `).join("");
 
     return `
     <table>
       <thead>
         <tr>
           <th>#</th><th>Equipo</th><th>J</th><th>G</th><th>E</th>
-          <th>P</th><th>GF</th><th>GC</th><th>Dif</th><th>Pts</th>
+          <th>P</th><th>GF</th><th>GC</th><th>Dif</th>
+          <th>Pts</th><th>Fase</th>
         </tr>
       </thead>
       <tbody>${rows}</tbody>
@@ -100,37 +126,33 @@ export function generateStandingsTable(tournament) {
   `;
 }
 
-// 4) Estadísticas por equipo
+// 5) Estadísticas por Equipo
 export function generateTeamStatsTable(tournament) {
-    const teams = Array.isArray(tournament.teams) ? tournament.teams : [];
-    if (teams.length === 0) {
+    if (!tournament.teams.length) {
         return '<p>⚠️ Sin estadísticas de equipos</p>';
     }
 
-    const rows = teams.map(team => {
-        const s = team.stats || {};
-        const gd = (s.goalsFor || 0) - (s.goalsAgainst || 0);
-        return `
-      <tr>
-        <td>${team.name           || ''}</td>
-        <td>${s.played            || 0}</td>
-        <td>${s.won               || 0}</td>
-        <td>${s.draw              || 0}</td>
-        <td>${s.lost              || 0}</td>
-        <td>${s.goalsFor          || 0}</td>
-        <td>${s.goalsAgainst      || 0}</td>
-        <td>${gd}</td>
-        <td>${team.phaseReached   || ''}</td>
-      </tr>
-    `;
-    }).join('');
+    const rows = tournament.teams.map(t => `
+    <tr>
+      <td>${t.name}</td>
+      <td>${t.stats.played}</td>
+      <td>${t.stats.won}</td>
+      <td>${t.stats.draw}</td>
+      <td>${t.stats.lost}</td>
+      <td>${t.stats.goalsFor}</td>
+      <td>${t.stats.goalsAgainst}</td>
+      <td>${t.stats.goalsFor - t.stats.goalsAgainst}</td>
+      <td>${t.phaseReached}</td>
+    </tr>
+  `).join("");
 
     return `
     <table>
       <thead>
         <tr>
-          <th>Equipo</th><th>Jugados</th><th>Ganados</th><th>Empates</th>
-          <th>Perdidos</th><th>GF</th><th>GC</th><th>Dif</th><th>Fase Alc.</th>
+          <th>Equipo</th><th>Jugados</th><th>Ganados</th>
+          <th>Empates</th><th>Perdidos</th><th>GF</th>
+          <th>GC</th><th>Dif</th><th>Fase</th>
         </tr>
       </thead>
       <tbody>${rows}</tbody>
@@ -138,43 +160,40 @@ export function generateTeamStatsTable(tournament) {
   `;
 }
 
-// 5) Estadísticas individuales (goleadores)
+// 6) Ranking de Goleadores
 export function generateIndividualStatsTable(tournament) {
     const map = {};
-    const matches = Array.isArray(tournament.matches) ? tournament.matches : [];
-
-    matches.forEach(m => {
-        const scorers = Array.isArray(m.scorers) ? m.scorers : [];
-        scorers.forEach(g => {
-            const key = g.name || '';
-            if (!map[key]) {
-                map[key] = { name: key, team: g.team || '', goals: 0, minutes: [] };
-            }
-            map[key].goals++;
-            map[key].minutes.push(g.minute || '');
-        });
+    (tournament.players || []).forEach(p => {
+        const key = `${p.name}||${p.team}`;
+        if (!map[key]) map[key] = { name: p.name, team: p.team, goals: 0, minutes: [] };
+        map[key].goals++;
+        if (p.minute != null) map[key].minutes.push(p.minute);
     });
 
-    const players = Object.values(map).sort((a, b) => b.goals - a.goals);
-    if (players.length === 0) {
+    const players = Object.values(map).sort((a, b) =>
+        b.goals !== a.goals ? b.goals - a.goals : a.name.localeCompare(b.name)
+    );
+
+    if (!players.length) {
         return '<p>⚠️ No hay datos de goleadores</p>';
     }
 
-    const rows = players.map((p, i) => `
+    const rows = players.map((pl, i) => `
     <tr>
       <td>${i + 1}</td>
-      <td>${p.name}</td>
-      <td>${p.team}</td>
-      <td>${p.goals}</td>
-      <td>${p.minutes.join(', ')}</td>
+      <td>${pl.name}</td>
+      <td>${pl.team}</td>
+      <td>${pl.goals}</td>
+      <td>${pl.minutes.join(", ")}</td>
     </tr>
-  `).join('');
+  `).join("");
 
     return `
     <table>
       <thead>
         <tr>
-          <th>#</th><th>Jugador</th><th>Equipo</th><th>Goles</th><th>Minutos</th>
+          <th>#</th><th>Jugador</th><th>Equipo</th>
+          <th>Goles</th><th>Minutos</th>
         </tr>
       </thead>
       <tbody>${rows}</tbody>
